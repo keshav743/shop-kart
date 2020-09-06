@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+
+    <div class="top-nav">
+        <h1>SHOPKART</h1>
+        <h6>BUYER DASHBOARD</h6>
+        <table>
+          <tr>
+            <td>
+              <form action="/logout">
+                <button class="btn btn-outline-dark btn-md">Logout</button>
+              </form>
+            </td>
+            <td>
+              <form action="/itemsInCart" method="GET">
+                <button type="submit" class="btn btn-outline-dark bt">Items That You Added To Cart</button>
+              </form>
+            </td>
+            <td>
+              <form action="/boughtItems" method="GET">
+                <button type="submit" class="btn btn-outline-dark bt">Items That You Bought</button>
+              </form>
+            </td>
+          </tr>
+        </table>        
+    </div>
+
+    <div class="user-div">
+      <h2>Welcome <%= username %></h2>
+    </div>
+
+    <div class="your-items">
+      <% if(items.length == 0){ %>
+        <div class="item-le"><h3>No Items To Display...</h3></div>
+      <% }else{ %>
+        <div class="item-le"><h3>Items Newly Added:</h3></div>
+        <% for(var i=0; i<items.length; i++){ %>
+          <div class="prod-div">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td><img src="<%=items[i].url%>" alt="item-img" class="prod-img"></td>
+                  <td>
+                    <h5 id="item-name">Name: <%=items[i].name%></h5>
+                    <h5 id="item-desc">Description: <%=items[i].description%></h5>
+                    <h5 id="item-quantity">Quantity: <%=items[i].quantity%></h5>
+                    <h5 id="item-price">Price: <%=items[i].price%> INR</h5>
+                    <h5 id="item-seller">Seller: <%=items[i].seller%></h5>
+                  </td>
+                  <td>
+                    <table>
+                      <tr>
+                        <td>
+                          <form action="/addToCart" method="POST" class="cart-form">
+                            <input type="hidden" name="name" id="name" value="<%=items[i].name%>"/>
+                            <input type="hidden" name="description" id="desc" value="<%=items[i].description%>"/>
+                            <input type="hidden" name="quantity" id="quantity" value="<%=items[i].quantity%>"/>
+                            <input type="hidden" name="price" id="price" value="<%=items[i].price%>"/>
+                            <input type="hidden" name="seller" id="seller" value="<%=items[i].seller%>"/>
+                            <input type="hidden" name="url" id="url" value="<%=items[i].url%>"/>
+                            <button type="submit" class="btn btn-outline-success add-to-cart-btn">Add To Cart</button>
+                          </form>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <form action="/buyNow" method="POST">
+                            <input type="hidden" name="name" id="name" value="<%=items[i].name%>"/>
+                            <input type="hidden" name="description" id="desc" value="<%=items[i].description%>"/>
+                            <input type="hidden" name="quantity" id="quantity" value="<%=items[i].quantity%>"/>
+                            <input type="hidden" name="price" id="price" value="<%=items[i].price%>"/>
+                            <input type="hidden" name="seller" id="seller" value="<%=items[i].seller%>"/>
+                            <input type="hidden" name="url" id="url" value="<%=items[i].url%>"/>
+                            <button type="submit" class="btn btn-outline-success buy-btn">Buy Now</button>
+                          </form>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      <% } %>  
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>  
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="/js/index.js
+    "></script>
+  </body>
+</html>    

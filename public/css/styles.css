@@ -1,0 +1,33 @@
+h2,h6,h1,h5,h2,h3,h4{
+    text-align: left;
+    font-family: 'Bebas Neue', cursive;
+}
+.register-form{
+    margin: 6rem 10rem;
+}
+.top-nav{
+    background-color: #eae2b7;
+    padding: 3rem 10rem 1rem;
+}
+.user-div{
+    margin: 2rem 10rem;
+}
+.item-div{
+    padding: 1rem 10rem;
+}
+.prod-img{
+    height: 10rem;
+    width: 10rem;
+}
+.item-le{
+    padding: 1rem 10rem ;
+}
+.prod-div{
+    padding: 2rem 10rem;
+}
+.cart-btn{
+    margin-right: 7rem;
+}
+.bt{
+    margin-left: 1rem;
+}

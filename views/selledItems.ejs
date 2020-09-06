@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+
+    <div class="top-nav">
+        <h1>SHOPKART</h1>
+        <h6>CART ITEMS</h6>
+        <form action="/logout">
+            <button class="btn btn-warning btn-md">LOGOUT</button>
+        </form>
+    </div>
+    <div class="user-div">
+        <h2>Welcome <%= username %></h2>
+    </div>
+
+    <div class="your-items">
+        <% if(items.length == 0){ %>
+          <div class="item-le"><h3>No Items were purchased...</h3></div>
+        <% }else{ %>
+          <div class="item-le"><h3>Items Purchased:</h3></div>
+          <% for(var i=0; i<items.length; i++){ %>
+            <div class="prod-div">
+              <table class="table table-borderless">
+                <tbody>
+                  <tr>
+                    <td><img src="<%=items[i].url%>" alt="item-img" class="prod-img"></td>
+                    <td>
+                      <h5 id="item-name">Name: <%=items[i].name%></h5>
+                      <h5 id="item-desc">Description: <%=items[i].description%></h5>
+                      <h5 id="item-price">Price: <%=items[i].price%></h5>
+                      <h5 id="item-buyer">Buyer: <%=items[i].buyer%></h5>
+                      <h5 id="item-buyerEmail">Buyer Email: <%=items[i].buyerEmail%></h5>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        <% } %>    
+    </div>            
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>  
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  </body>
+</html>    
