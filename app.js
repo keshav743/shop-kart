@@ -165,7 +165,7 @@ app.get("/sellerdashboard",function(req,res){
                 }   
                 console.log(items);
             }
-        res.render("sellerdashboard",{username: (loginUsername=="") ? regUsername : loginUsername, items: items});   
+        res.render("sellerdashboard",{username: (loginUsername=="") ? regUsername : loginUsername, items: items.reverse()});   
         });
     }else{
         res.redirect("/");
@@ -222,7 +222,9 @@ app.get("/logout",function(req,res){
 });
 
 app.get("/addItem",function(req,res){
-    res.render("addItem",{username: (loginEmail=="") ? regEmail : loginEmail});
+    if(authenticated==true){
+        res.render("addItem",{username: (loginEmail=="") ? regEmail : loginEmail});
+    }
 });
 
 app.post("/addItem",function(req,res){
@@ -257,7 +259,8 @@ app.post("/addToCart",function(req,res){
         itemDescription: req.body.description,
         sellerName: req.body.seller,
         price: req.body.price,
-        url: req.body.url
+        url: req.body.url,
+        quantity: req.body.quantity
     };
     console.log(obj)
     user.update(
@@ -276,38 +279,44 @@ app.post("/addToCart",function(req,res){
 
 app.get("/itemsInCart",function(req,res){
     var cartItemsNew = [];
-    user.find({email: (loginEmail=="") ? regEmail : loginEmail},function(err,user){
-        if(err){
-            console.log(err);
-        }else{
-            if(user){
-                if(! user[0].cartItems == []){
-                    for(var i=0; i<user[0].cartItems.length; i++){
-                        cartItemsNew.push(user[0].cartItems[i]);
+    if(authenticated == true){
+        user.find({email: (loginEmail=="") ? regEmail : loginEmail},function(err,user){
+            if(err){
+                console.log(err);
+            }else{
+                if(user){
+                    if(! user[0].cartItems == []){
+                        for(var i=0; i<user[0].cartItems.length; i++){
+                            cartItemsNew.push(user[0].cartItems[i]);
+                        }
+                        console.log(cartItemsNew);
                     }
-                    console.log(cartItemsNew);
                 }
             }
-        }
-        res.render("itemsInCart",{username: ((loginUsername=="") ? regUsername : loginUsername), items: cartItemsNew});
-    });
+            res.render("itemsInCart",{username: ((loginUsername=="") ? regUsername : loginUsername), items: cartItemsNew.reverse()});
+        });
+    }
 });
 
 app.get("/boughtItems",function(req,res){
-    boughtItem.find({buyer: loginUsername == "" ? regUsername : loginUsername},function(err,item){
-        if(err){
-            res.send(err);
-        }else{
-            if(item){
-                console.log(item);
-                res.render("boughtItems",{username: loginUsername == "" ? regUsername : loginUsername, items: item.reverse()});
+    if(authenticated == true){
+        boughtItem.find({buyer: loginUsername == "" ? regUsername : loginUsername},function(err,item){
+            if(err){
+                res.send(err);
+            }else{
+                if(item){
+                    console.log(item);
+                    res.render("boughtItems",{username: loginUsername == "" ? regUsername : loginUsername, items: item.reverse()});
+                }
             }
-        }
-    });
+        });
+    }
 });
 
 app.get("/buyNow",function(req,res){
-    res.render("buyNow",{username: ((loginUsername == "") ? regUsername : loginUsername)});
+    if(authenticated == true){
+        console.log(req.body);
+    }
 });
 
 app.post("/buyNow",function(req,res){
@@ -365,7 +374,9 @@ var purQuantity = "";
 var purURL = "";
 
 app.get("/modifyItems",function(req,res){
-    res.render("modify",{username: (loginUsername == "")?regUsername:loginUsername, name: purName, description: purDescription, price: purPrice, quantity: purQuantity, url:purURL});
+    if(authenticated == true){
+        res.render("modify",{username: (loginUsername == "")?regUsername:loginUsername, name: purName, description: purDescription, price: purPrice, quantity: purQuantity, url:purURL});
+    }
 });
 
 app.post("/modifyItems",function(req,res){
@@ -395,17 +406,78 @@ app.post("/modifyItemsFinal",function(req,res){
 });
 
 app.get("/selledItems",function(req,res){
+    if(authenticated == true){
+        boughtItem.find({seller: (loginEmail == "")?regEmail:loginEmail},function(err,item){
+            if(err){
+                console.log(err);
+            }else{
+                if(item){
+                    console.log(item);
+                    res.render("selledItems",{username: (loginUsername == "")?regUsername:loginUsername, items: item.reverse()})
+                }
+            }
+        });        
+    }
+});
 
-    boughtItem.find({seller: (loginEmail == "")?regEmail:loginEmail},function(err,item){
+app.get("/delete",function(req,res){
+    console.log("Delete");
+});
+
+app.post("/delete",function(req,res){
+    console.log(req.body);
+    user.update({ username: (loginUsername == "") ? regUsername : loginUsername }, { "$pull": { "cartItems": { "itemName": req.body.name, "sellerName": req.body.seller } }}, { safe: true, multi:true }, function(err, obj) {
         if(err){
             console.log(err);
         }else{
-            if(item){
-                console.log(item);
-                res.render("selledItems",{username: (loginUsername == "")?regUsername:loginUsername, items:item})
-            }
+            console.log(obj);
+            res.redirect("/buyerdashboard");
         }
     });
+});
+
+app.get("/sellerDeleteItem",function(req,res){
+    console.log("Error");
+});
+
+app.post("/sellerDeleteItem",function(req,res){
+    item.deleteOne({seller: loginEmail == "" ? regEmail : loginEmail, name: req.body.name, price: req.body.price, url: req.body.url, description: req.body.description},function(err,item){
+        if(err){
+            console.log(err);
+        }else{
+            console.log(item);
+            res.redirect("/sellerdashboard");
+        }
+    });
+});
+
+var searchedItem = "";
+
+app.get("/searchItem",function(req,res){
+    var searchItems = [];
+    if(authenticated == true){
+        item.find({quantity: {$ne: "0"}},function(err,items){
+            if(err){
+                console.log(err);
+            }else{
+                if(items){
+                    for(var i=0; i<items.length; i++){
+                        if((items[i].name.toLowerCase()).includes(searchedItem.toLowerCase())){
+                            searchItems.push(items[i]);
+                        }
+                    }
+                    console.log(searchItems);
+                }
+            }
+            res.render("search",{username: (loginUsername == "")? regUsername: loginUsername ,items: searchItems});
+        });
+    }
+});
+
+app.post("/searchItem",function(req,res){
+    console.log(req.body.search);
+    searchedItem = req.body.search;
+    res.redirect("/searchItem");
 });
 
 app.listen(3000,function(){

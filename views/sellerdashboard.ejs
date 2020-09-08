@@ -52,7 +52,7 @@
                       <h5>Name: <%=items[i].name%></h5>
                       <h5>Description: <%=items[i].description%></h5>
                       <h5>Quantity: <%=items[i].quantity%></h5>
-                      <h5>Price: <%=items[i].price%></h5>
+                      <h5>Price: <%=items[i].price%> INR</h5>
                     </td>
                     <td>
                       <form action="/modifyItems" method="POST">
@@ -63,6 +63,16 @@
                         <input type="hidden" name="url" id="url" value="<%=items[i].url%>"/>
                         <button type="submit" class="btn btn-outline-success">Modify</button>
                       </form></td>
+                    <td>
+                      <form action="/sellerDeleteItem" method="POST">
+                        <input type="hidden" name="name" id="name" value="<%=items[i].name%>"/>
+                        <input type="hidden" name="description" id="desc" value="<%=items[i].description%>"/>
+                        <input type="hidden" name="quantity" id="quantity" value="<%=items[i].quantity%>"/>
+                        <input type="hidden" name="price" id="price" value="<%=items[i].price%>"/>
+                        <input type="hidden" name="url" id="url" value="<%=items[i].url%>"/>
+                        <button type="submit" class="btn btn-outline-danger">Delete Item</button>
+                      </form>
+                    </td>  
                   </tr>
                 </tbody>
               </table>

@@ -13,7 +13,7 @@
         <h1>SHOPKART</h1>
         <h6>CART ITEMS</h6>
         <form action="/logout">
-            <button class="btn btn-warning btn-md">LOGOUT</button>
+            <button class="btn btn-outline-dark btn-md">LOGOUT</button>
         </form>
     </div>
     <div class="user-div">
@@ -34,9 +34,16 @@
                     <td>
                       <h5 id="item-name">Name: <%=items[i].itemName%></h5>
                       <h5 id="item-desc">Description: <%=items[i].itemDescription%></h5>
-                      <h5 id="item-price">Price: <%=items[i].price%></h5>
+                      <h5 id="item-price">Price: <%=items[i].price%> INR</h5>
                       <h5 id="item-seller">Seller: <%=items[i].sellerName%></h5>
                     </td>
+                    <td>
+                      <form action="/delete" method="post">
+                        <input type="hidden" name="name" value="<%= items[i].itemName %>">
+                        <input type="hidden" name="seller" value="<%= items[i].sellerName %>">
+                        <button type="submit" class="btn btn-outline-danger">Delete</button>
+                      </form>
+                    </td>      
                   </tr>
                 </tbody>
               </table>
