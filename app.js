@@ -141,8 +141,12 @@ app.post("/",function(req,res){
 });
 
 app.get("/sellerdashboard",function(req,res){
-    var items = [];
     if(authenticated == true){
+        var items = [];
+        var a = 0;
+        var b = 0;
+        var d = 0;
+        var c = 0;
         item.find({seller: (loginEmail=="") ? regEmail : loginEmail},function(err,result){
             if(err){
                 console.log(err)
@@ -160,12 +164,28 @@ app.get("/sellerdashboard",function(req,res){
                         itemPrice = result[i].price;
                         itemURL = result[i].url;
                         var itemScript = {name: itemName, description: itemDescription, quantity: itemQuantity, price: itemPrice, url: itemURL};
+                        a+=Number(itemQuantity);
                         items.push(itemScript);
                     }
                 }   
                 console.log(items);
+                boughtItem.find({seller: (loginEmail=="") ? regEmail : loginEmail},function(err,result){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        if(result){
+                            b+=Number(result.length);
+                            console.log(a);
+                            console.log(b);
+                            d = (b/(a+b)) * 100;
+                            console.log(d);
+                            c = (a/(a+b)) * 100;
+                            console.log(c);
+                            res.render("sellerdashboard",{username: (loginUsername=="") ? regUsername : loginUsername, items: items.reverse(), a: c, b: d});   
+                        }
+                    }
+                });
             }
-        res.render("sellerdashboard",{username: (loginUsername=="") ? regUsername : loginUsername, items: items.reverse()});   
         });
     }else{
         res.redirect("/");
@@ -218,6 +238,7 @@ app.get("/logout",function(req,res){
     regRole = "";
     loginRole = "";
     loginUsername = "";
+    authenticated = false;
     res.redirect("/");
 });
 
@@ -229,23 +250,27 @@ app.get("/addItem",function(req,res){
 
 app.post("/addItem",function(req,res){
     console.log(req.body);
-    const newItem = new item({
-        name: req.body.itemName,
-        description: req.body.itemDescription,
-        quantity: req.body.quantity,
-        price: req.body.itemPrice,
-        seller: (loginEmail=="") ? regEmail : loginEmail,
-        url: req.body.imageURL
-    });
-    newItem.save(function (err, result) {
-        if(err){
-            console.error(result);
-            res.redirect("/addItem");
-        }else{
-            console.log(result.name + " saved to items collection.");
-            res.redirect("/sellerdashboard");
-        }    
-      });
+    if(req.body.itemName != "" && req.body.itemDescription != "" && Number(req.body.quantity) >=0 && Number(req.body.itemPrice) >=0 && req.body.imageURL != ""){
+        const newItem = new item({
+            name: req.body.itemName,
+            description: req.body.itemDescription,
+            quantity: req.body.quantity,
+            price: req.body.itemPrice,
+            seller: (loginEmail=="") ? regEmail : loginEmail,
+            url: req.body.imageURL
+        });
+        newItem.save(function (err, result) {
+            if(err){
+                console.error(result);
+                res.redirect("/addItem");
+            }else{
+                console.log(result.name + " saved to items collection.");
+                res.redirect("/sellerdashboard");
+            }    
+          });        
+    }else{
+        res.redirect("/sellerdashboard");
+    }
 });
 
 app.get("/addToCart",function(req,res){

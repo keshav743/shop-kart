@@ -2,11 +2,14 @@ h2,h6,h1,h5,h2,h3,h4{
     text-align: left;
     font-family: 'Bebas Neue', cursive;
 }
+body{
+    background-color: #fdfdff;
+}
 .register-form{
     margin: 6rem 10rem;
 }
 .top-nav{
-    background-color: #eae2b7;
+    background-color: #b0c4b1;
     padding: 3rem 10rem 1rem;
 }
 .user-div{
@@ -30,4 +33,8 @@ h2,h6,h1,h5,h2,h3,h4{
 }
 .bt{
     margin-left: 1rem;
+}
+.search-input{
+    margin-left: 1rem;
+    display: inline;
 }
