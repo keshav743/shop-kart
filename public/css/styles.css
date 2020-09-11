@@ -6,7 +6,15 @@ body{
     background-color: #fdfdff;
 }
 .register-form{
-    margin: 6rem 10rem;
+    margin-left: 10rem;
+    margin-top: 6rem;
+}
+.register-form-reg{
+    margin-left: 10rem;
+}
+.register-form-reg-hint{
+    margin-left: 10rem;
+    margin-top: 1rem;
 }
 .top-nav{
     background-color: #b0c4b1;
