@@ -2,12 +2,24 @@ const express = require("express");
 const parser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
+const { use, Passport } = require("passport");
 
 const app = express();
 
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
 app.use(parser.urlencoded());
+app.use(session({
+    secret: "shopKart",
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect('mongodb://localhost:27017/shopDB', {useNewUrlParser: true, useUnifiedTopology: true});
 const userSchema = mongoose.Schema({
@@ -19,6 +31,9 @@ const userSchema = mongoose.Schema({
     cartItems: Array,
     purchasedItems: Array,
   });
+
+userSchema.plugin(passportLocalMongoose);  
+
 const itemSchema = mongoose.Schema({
     name: String,
     description: String,
@@ -37,6 +52,15 @@ const boughtItemSchema = mongoose.Schema({
     buyerEmail: String,
   });
 const user = mongoose.model('User', userSchema);
+
+passport.use(user.createStrategy());
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
+
 const item = mongoose.model('Item', itemSchema);
 const boughtItem = mongoose.model('BoughtItem', boughtItemSchema);
 
@@ -77,7 +101,6 @@ app.post("/register",function(req,res){
                     if(result.length > 0){
                         res.redirect("/register");
                     }else{
-                        console.log("HI");
                         const newUser = new user({
                             name: regName,
                             username: regUsername,
@@ -87,20 +110,28 @@ app.post("/register",function(req,res){
                             cartItems: [],
                             purchasedItems: [],
                         });
-                    
-                        newUser.save(function (err, result) {
+                        user.register(newUser,regPassword,function(err,user){
                             if(err){
-                                console.error(result);
-                                res.redirect("/register");
+                                console.log(err);
+                                res.redirect("/");
                             }else{
-                                console.log(result.email + " saved to users collection.");
-                                authenticated = true;
-                                if(regRole=="Buyer"){
-                                    res.redirect("/buyerdashboard");
-                                }else{
-                                    res.redirect("/sellerdashboard");
-                                } 
-                            }    
+                                passport.authenticate("local")(req,res,function(){
+                                        newUser.save(function (err, result) {
+                                            if(err){
+                                                console.error(result);
+                                                res.redirect("/register");
+                                            }else{
+                                                console.log(result.email + " saved to users collection.");
+                                                authenticated = true;
+                                                if(regRole=="Buyer"){
+                                                    res.redirect("/buyerdashboard");
+                                                }else{
+                                                    res.redirect("/sellerdashboard");
+                                                } 
+                                            }    
+                                        });                    
+                                });
+                            }
                         });
                     }
                 }
@@ -126,11 +157,21 @@ app.post("/",function(req,res){
                     authenticated = true;
                     loginUsername = user.username;
                     loginRole = user.role;
-                    if(loginRole=="Buyer"){
-                        res.redirect("/buyerdashboard");
-                    }else{
-                        res.redirect("/sellerdashboard");
-                    } 
+                    req.login(user,function(err){
+                        if(err){
+                            console.log(err);       
+                        }else{
+                            // passport.authenticate("local")(req,res,function(){
+                                console.log(req);
+                                if(loginRole=="Buyer"){
+                                    res.redirect("/buyerdashboard");
+                                }else{
+                                    res.redirect("/sellerdashboard");
+                                } 
+                            // });
+                        }
+                    });
+
                 }
             }else{
                 res.redirect("/");
@@ -238,6 +279,7 @@ app.get("/logout",function(req,res){
     loginRole = "";
     loginUsername = "";
     authenticated = false;
+    req.logOut();
     res.redirect("/");
 });
 
