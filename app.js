@@ -117,7 +117,7 @@ app.get("/",function(req,res){
 app.post("/",function(req,res){
     loginEmail = req.body.email;
     loginPassword = req.body.password;
-    user.findOne({email: loginEmail},function(err,user){
+    user.findOne({email: loginEmail, password: loginPassword},function(err,user){
         if(err){
             console.log(err);
         }else{
