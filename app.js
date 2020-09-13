@@ -56,8 +56,6 @@ app.get("/register",function(req,res){
 });
 
 app.post("/register",function(req,res){
-    console.log(req);
-    var data = [];
     regName = req.body.name;
     regUsername = req.body.username;
     regEmail = req.body.email;
@@ -71,42 +69,43 @@ app.post("/register",function(req,res){
     if(regPassword.length < 8 || regUsername.length == 0 || regName.length == 0 || regEmail.length == 0 || regRole == "" || !regPassword.match(/^[0-9a-zA-Z]+$/)){
         res.redirect("/register");
     }else{
-        user.find({},function(err,result){
+        user.find({ $or: [{ email: regEmail }, { username: regUsername }] },function(err,result){
             if(err){
                 console.log(err);
             }else{
-                data = result;
+                if(result){
+                    if(result.length > 0){
+                        res.redirect("/register");
+                    }else{
+                        console.log("HI");
+                        const newUser = new user({
+                            name: regName,
+                            username: regUsername,
+                            email: regEmail,
+                            password: regPassword,
+                            role: regRole,
+                            cartItems: [],
+                            purchasedItems: [],
+                        });
+                    
+                        newUser.save(function (err, result) {
+                            if(err){
+                                console.error(result);
+                                res.redirect("/register");
+                            }else{
+                                console.log(result.email + " saved to users collection.");
+                                authenticated = true;
+                                if(regRole=="Buyer"){
+                                    res.redirect("/buyerdashboard");
+                                }else{
+                                    res.redirect("/sellerdashboard");
+                                } 
+                            }    
+                        });
+                    }
+                }
             }
         });
-        data.forEach(function(item){
-            if(item.email === regEmail || item.username === regUsername){
-                res.redirect("/register");
-            }
-        });
-        const newUser = new user({
-            name: regName,
-            username: regUsername,
-            email: regEmail,
-            password: regPassword,
-            role: regRole,
-            cartItems: [],
-            purchasedItems: [],
-        });
-    
-        newUser.save(function (err, result) {
-            if(err){
-                console.error(result);
-                res.redirect("/register");
-            }else{
-                console.log(result.email + " saved to users collection.");
-                authenticated = true;
-                if(regRole=="Buyer"){
-                    res.redirect("/buyerdashboard");
-                }else{
-                    res.redirect("/sellerdashboard");
-                } 
-            }    
-          });
     }
 
 });
@@ -244,7 +243,7 @@ app.get("/logout",function(req,res){
 
 app.get("/addItem",function(req,res){
     if(authenticated==true){
-        res.render("addItem",{username: (loginEmail=="") ? regEmail : loginEmail});
+        res.render("addItem",{username: (loginUsername=="") ? regUsername : loginUsername});
     }
 });
 
